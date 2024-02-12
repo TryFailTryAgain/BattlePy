@@ -1,2 +1,2 @@
 # BattlePy
-Battleship build in python
+Runs a basic Battleship game made using python
