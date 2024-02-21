@@ -1,29 +1,45 @@
 import sys, pygame, random
+from gameComponents import GameBoard, Ship
 # Gameboard creation and setup
 
-def setupGameBoard(gameBoard, shipList):
+
+def setupGameBoard(boardSize, shipSizeList):
     print("--Gameboard setup--")
+    gameBoard = GameBoard(boardSize)
+
     # Loops through the shipList and place the ships on the gameboard
-    for ship in shipList:
+    for size in shipSizeList:
+        gameBoard.ships.append(Ship(size))
+
+    for ship in GameBoard.ships:
         AutoPlaceShip(gameBoard, ship)
-    
+
+
 def AutoPlaceShip(gameBoard, ship):
     print("-- Auto choosing ship location--")
     # Gets a random position on the gameboard and check if the ship can be placed there in any direction
     directions = []
     while len(directions) == 0:
-        print("-Finding a valid position for ship of length: ", ship, "-")
-        x, y = getRandomCords(gameBoard)
-        directions = availableDIrections(gameBoard, ship, x, y)
+        print("-Finding a valid position for ship of length: ", ship.length, "-")
+        x, y = getRandomCords(gameBoard.board)
+        directions = availableDIrections(gameBoard.board, ship.length, x, y)
     
     # Once a valid position and direction are found, proceed with placing the ship
     print("-Available directions: ", directions)
     # Pick a random direction from the available directions
     direction = random.choice(directions)
-    print("-Attempting to place ship of length: ", ship, " at: ", x, y, "facing: ", direction)
-    placeShip(gameBoard, ship, x, y, direction)
+    print("-Attempting to place ship of length: ", ship.length, " at: ", x, y, "facing: ", direction)
+    
+    # Modify the existing Ship object with the chosen coordinates and direction
+    ship.coordinates = (x, y)
+    ship.direction = direction
 
-def placeShip(gameBoard, ship, x, y, direction):
+    # Place the ship on the gameboard
+    placeShip(gameBoard.board, ship)
+
+def placeShip(gameBoard, ship):
+    x, y = ship.coordinates
+    direction = ship.direction
     print("--Placing Ship on game board--")
     # Places the ship on the gameboard
     if(direction == "up"):

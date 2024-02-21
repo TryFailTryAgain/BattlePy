@@ -1,4 +1,5 @@
 import sys, pygame
+from Classes.gameComponents import GameBoard, Ship
 # Imports functions
 from game_functions import *
 
@@ -7,17 +8,11 @@ from game_functions import *
 pygame.init()
 running = True
 
-# Defines a ship class TODO: Implement this
-class Ship:
-    def __init__(self, coordinates, direction, length):
-        self.coordinates = coordinates
-        self.direction = direction
-        self.length = length 
-
 # Define a gameboard for the enemy and the player
-playerGameBoard = [[0] * 10 for _ in range(10)]
-enemyGameBoard = [[0] * 10 for _ in range(10)]
-shipList = [5,4,3,3,2]
+# Allows for changing the size of the gameboard
+boardSize = 10
+# Allows for changing the size and quantity of the ships to be placed
+shipSizeList = [5,4,3,3,2]
 
 
 while running:
@@ -29,8 +24,8 @@ while running:
     # New game setup
     if(True):
         print("New game setup...")
-        setupGameBoard(playerGameBoard, shipList)
-        printGameBoard(playerGameBoard)
+        playerGameBoard = setupGameBoard(boardSize, shipSizeList)
+
         #setupGameBoard(enemyGameBoard, shipList)
         #printGameBoard(enemyGameBoard)
 
