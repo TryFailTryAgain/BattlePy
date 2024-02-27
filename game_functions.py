@@ -1,7 +1,6 @@
 import sys, pygame, random
-from gameComponents import GameBoard, Ship
+from Classes.gameComponents import GameBoard, Ship
 # Gameboard creation and setup
-
 
 def setupGameBoard(boardSize, shipSizeList):
     print("--Gameboard setup--")
@@ -9,18 +8,20 @@ def setupGameBoard(boardSize, shipSizeList):
 
     # Loops through the shipList and place the ships on the gameboard
     for size in shipSizeList:
-        gameBoard.ships.append(Ship(size))
+        gameBoard.addShip(Ship(size))
+    return gameBoard
 
-    for ship in GameBoard.ships:
-        AutoPlaceShip(gameBoard, ship)
+def placeAllShips(gameBoard):
+    print("--Placing all ships--")
+    for ship in gameBoard.ships:
+        autoPlaceShip(gameBoard, ship)
 
-
-def AutoPlaceShip(gameBoard, ship):
-    print("-- Auto choosing ship location--")
+def autoPlaceShip(gameBoard, ship):
+    print("---Auto choosing ship location---")
     # Gets a random position on the gameboard and check if the ship can be placed there in any direction
     directions = []
     while len(directions) == 0:
-        print("-Finding a valid position for ship of length: ", ship.length, "-")
+        print("--Finding a valid position for ship of length: ", ship.length, "--")
         x, y = getRandomCords(gameBoard.board)
         directions = availableDIrections(gameBoard.board, ship.length, x, y)
     
@@ -28,8 +29,10 @@ def AutoPlaceShip(gameBoard, ship):
     print("-Available directions: ", directions)
     # Pick a random direction from the available directions
     direction = random.choice(directions)
-    print("-Attempting to place ship of length: ", ship.length, " at: ", x, y, "facing: ", direction)
-    
+    print("--Attempting to place ship: ")
+    print("-Length:", ship.length)
+    print("-At:", x, y)
+    print("-Facing:", direction)
     # Modify the existing Ship object with the chosen coordinates and direction
     ship.coordinates = (x, y)
     ship.direction = direction
@@ -38,45 +41,54 @@ def AutoPlaceShip(gameBoard, ship):
     placeShip(gameBoard.board, ship)
 
 def placeShip(gameBoard, ship):
-    x, y = ship.coordinates
+    print(ship.coordinates)
+    x,y = ship.coordinates
     direction = ship.direction
     print("--Placing Ship on game board--")
     # Places the ship on the gameboard
+    # Also place the x,y coordinates of the ship in the ship object
     if(direction == "up"):
-        for i in range(ship):
-            gameBoard[x][y - i] = ship
+        for i in range(ship.length):
+            gameBoard[y - i][x] = ship.length
+            ship.cordList.append((x, y - i))
     elif(direction == "down"):
-        for i in range(ship):
-            gameBoard[x][y + i] = ship
+        for i in range(ship.length):
+            gameBoard[y + i][x] = ship.length
+            ship.cordList.append((x, y + i))
     elif(direction == "left"):
-        for i in range(ship):
-            gameBoard[x - i][y] = ship
+        for i in range(ship.length):
+            gameBoard[y][x - i] = ship.length 
+            ship.cordList.append((x - i, y))
     elif(direction == "right"):
-        for i in range(ship):
-            gameBoard[x + i][y] = ship
+        for i in range(ship.length):
+            gameBoard[y][x + i] = ship.length
+            ship.cordList.append((x + i, y))
     else:
         print("Invalid direction")
-    
 
 def printGameBoard(gameBoard):
     print("---Game board---")
-    for row in gameBoard:
-        print(row)
+    for x in range(len(gameBoard.board)):
+        print(gameBoard.board[x])
     print("---End of game board---")
 
+# Returns a list of available directions for the ship to be placed
 def availableDIrections(gameBoard, ship, x, y):
     print("--Checking available directions--")
     up = True
     down = True
     left = True
     right = True
+    # Cycles through each direction and check if the ship can be placed there by
+        # iterating through the length of the ship and checking if the positions on the gameBoard are empty
     # Checks if the ship can be placed up
     if(y - ship >= 0):
         # Checks the values between the ship position and its end position
         for i in range(ship):
-            if(gameBoard[x][y - i] != 0):
+            if(gameBoard[y][x - i] != 0):
                 print("-Cannot place ship UP")
                 up = False
+                break
     else:
         up = False
 
@@ -86,6 +98,7 @@ def availableDIrections(gameBoard, ship, x, y):
             if(gameBoard[x][y + i] != 0):
                 print("-Cannot place ship DOWN")
                 down = False
+                break
     else:
         down = False
 
@@ -95,6 +108,7 @@ def availableDIrections(gameBoard, ship, x, y):
             if(gameBoard[x - i][y] != 0):
                 print("-Cannot place ship RIGHT")
                 left = False
+                break
     else:
         left = False
 
@@ -104,6 +118,7 @@ def availableDIrections(gameBoard, ship, x, y):
             if(gameBoard[x + i][y] != 0):
                 print("-Cannot place ship LEFT")
                 right = False
+                break
     else:
         right = False
 
@@ -117,5 +132,39 @@ def getRandomCords(gameBoard):
     print("--Getting random cords--")
     x = random.randint(0, len(gameBoard) - 1)
     y = random.randint(0, len(gameBoard[0]) - 1)
-    print("Random cords: ", x, y)
+    print("Random cords: (", x, ",", y, ")")
     return x, y
+
+def attack(gameBoard, cords):
+    print("--Attacking--")
+    x, y = cords
+    print("Attacking cords: (", x, ",", y, ")")
+    if(gameBoard.board[y][x] == 0):
+        print("Miss")
+        # Marks the coordinate as missed so it is not attacked again
+        gameBoard.board[y][x] = -1
+        return 0
+    elif(gameBoard.board[y][x] == -1):
+        print("Already attacked")
+        return -1
+
+    else:
+        print("Hit")
+        # Marks the coordinate as hit so it is not attacked again
+        gameBoard.board[y][x] = "X"
+        # Gets the ship object from the gameBoard that lays on that coordinate
+        ship = getShip(gameBoard, cords)
+        # Removes the coordinates from the ship object
+        ship.cordList.remove(cords)
+        # If the ship has no more coordinates, it has been destroyed
+        if(len(ship.cordList) == 0):
+            print("Ship destroyed")
+            gameBoard.ships.remove(ship)
+        return 1
+
+def getShip(gameboard, cords):
+    print("--Getting ship--")
+    for ship in gameboard.ships:
+        if cords in ship.cordList:
+            print("Ship found")
+            return ship

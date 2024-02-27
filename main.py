@@ -24,8 +24,14 @@ while running:
     # New game setup
     if(True):
         print("New game setup...")
-        playerGameBoard = setupGameBoard(boardSize, shipSizeList)
-
+        player1GameBoard = setupGameBoard(boardSize, shipSizeList)
+        placeAllShips(player1GameBoard)
+        printGameBoard(player1GameBoard)
+        print(player1GameBoard.ships[0].cordList)
+        while(attack(player1GameBoard, player1GameBoard.ships[0].cordList[0]) == -1):
+            print("Target already hit, try again...")
+        printGameBoard(player1GameBoard)
+               
         #setupGameBoard(enemyGameBoard, shipList)
         #printGameBoard(enemyGameBoard)
 

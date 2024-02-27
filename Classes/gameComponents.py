@@ -11,9 +11,9 @@ class GameBoard:
 class Ship:
     def __init__(self, length, coordinates=None, direction=None):
         self.length = length
-        self.coordinates = coordinates if coordinates is not None else (0, 0)
+        self.headCord = coordinates if coordinates is not None else (0, 0)
         self.direction = direction if direction is not None else ''
-
+        self.cordList = []
     # Getters to get the x and y coordinates individually
     @property
     def xcoord(self):
