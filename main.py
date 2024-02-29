@@ -14,7 +14,6 @@ boardSize = 10
 # Allows for changing the size and quantity of the ships to be placed
 shipSizeList = [5,4,3,3,2]
 
-
 while running:
     # poll for events
     # pygame.QUIT event means the user clicked X to close your window
@@ -27,14 +26,12 @@ while running:
         player1GameBoard = setupGameBoard(boardSize, shipSizeList)
         placeAllShips(player1GameBoard)
         printGameBoard(player1GameBoard)
-        print(player1GameBoard.ships[0].cordList)
-        while(attack(player1GameBoard, player1GameBoard.ships[0].cordList[0]) == -1):
-            print("Target already hit, try again...")
+        # Attack the gameBoard, remove ships from the gameBoard one by one
+        while player1GameBoard.ships and player1GameBoard.ships[0].cordList:
+            attack(player1GameBoard, player1GameBoard.ships[0].cordList[0])
         printGameBoard(player1GameBoard)
-               
         #setupGameBoard(enemyGameBoard, shipList)
         #printGameBoard(enemyGameBoard)
-
 
     running = False
 
